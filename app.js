@@ -45,14 +45,39 @@ class Db{
          if(despesa === null){
             continue;
          }
+
+         despesa.id = i;
          despesas.push(despesa);
       }
       return despesas;
    }
 
    pesquisar(sd){
-      console.log(sd);
+       let despesasSearch = Array();
 
+       despesasSearch = this.recuperarTodosRegistros();
+
+       //Aplicando Filtros de PEsquisas em Array
+
+       if(sd.dia != ''){
+         despesasSearch = despesasSearch.filter(d => d.dia == sd.dia);
+       }
+       if(sd.tipo != ''){
+         despesasSearch = despesasSearch.filter(d => d.tipo == sd.tipo);
+       }
+       if(sd.descricao != ''){
+         despesasSearch = despesasSearch.filter(d => d.descricao == sd.descricao);
+       }
+       if(sd.valor != ''){
+         despesasSearch = despesasSearch.filter(d => d.valor == sd.valor );
+       }
+
+       return despesasSearch;
+
+   }
+
+   removerRegistro(id){
+      localStorage.removeItem(id);      
    }
 
 }
@@ -104,11 +129,14 @@ let db = new Db();
 
    
  };
- function carregaListaDeDespesas(){
-   let despesas = Array();
+ function carregaListaDeDespesas(despesas = Array(), filtro = false){
+   
+   if(despesas.length == 0 && filtro == false){
     despesas = db.recuperarTodosRegistros();
+   }
 
      let tabelaD = document.getElementById('tabelaDespesas');
+     tabelaD.innerHTML = '';
 
      despesas.forEach(function(d){
 
@@ -137,6 +165,22 @@ let db = new Db();
 
          linha.insertCell(2).innerHTML = d.descricao;
          linha.insertCell(3).innerHTML = `R$ ${d.valor}`;
+
+         let btn = document.createElement("button");
+         btn.className = 'btn btn-danger';
+         btn.id = `id_despesa_${d.id}`;
+         
+         btn.onclick = () => {
+            
+            let id = btn.id.replace('id_despesa_', '');
+            db.removerRegistro(id);
+
+            window.location.reload();
+         }
+
+         btn.innerHTML = '<i class="fas fa-times"></i>'
+
+         linha.insertCell(4).append(btn);
      
      });
 
@@ -153,24 +197,8 @@ let db = new Db();
       descricao.value,
       valor.value);
 
-   if(searchDespesa.validar()){
-      db.pesquisar(searchDespesa);
-   }else{
-
-      if(isNaN(valor.value)){
-         document.getElementById('exampleModalLabel').innerHTML = 'Dados Inválidos';
-         document.getElementById('modalTitle').className = 'modal-header text-danger';
-         document.getElementById('modalBody').innerHTML = 'O campo VALOR deve conter apenas NÚMEROS.'
-         document.getElementById('btnVoltar').className ='btn btn-danger';
-         $('#Modal').modal('show')
-         }else{
-         document.getElementById('exampleModalLabel').innerHTML = 'Dados Inválidos';
-         document.getElementById('modalTitle').className = 'modal-header text-danger';
-         document.getElementById('modalBody').innerHTML = 'Preencha todos os campos para cadastrar uma despesa.'
-         document.getElementById('btnVoltar').className ='btn btn-danger';
-         $('#Modal').modal('show')
-         }
-   }
+      let despesas = db.pesquisar(searchDespesa);
+      carregaListaDeDespesas(despesas, true);
 
  }
 
