@@ -1,0 +1,14 @@
+h2{
+	font-family: "Arial";
+	font-size: 1em;
+	margin-left: 70px;
+	text-shadow: 1px 1px rgba(0,0,0,0.2);
+}
+.txtValor{
+	text-shadow: 1px 1px rgba(0,0,0,0.5);
+}
+.x{
+	color: #F52A00;
+	margin-left: 10px;
+	font-size: 0.8em; 	
+}
